@@ -1,0 +1,262 @@
+package goAlfred
+
+//
+// Package:          goAlfred
+//
+// Description:      This package is for helper function to create workflows for Alfred2 using
+//                           go. 
+//
+
+//
+// Import the libraries we use for this library.
+//
+import (
+	"log"
+	"bytes"
+	"os"
+	"os/exec"
+	"encoding/xml"
+)
+
+//
+// Class Variables
+//
+// Name                               Description
+//
+// cache                                path to the directory that contains the cache for the workflow
+// data                                  path to the directory that contains the data for the workflow
+// bundleId                           The ID for the bundle that represents the workflow
+// path                                  path to the workflow's directory
+// home                                path to the user's home directory
+// results                              the accumulated results. This will be converted to the XML list for 
+//                                          feedback into Alfred
+// err                                     The value of the last error found
+//
+
+type AlfredResult struct {
+	XMLName   xml.Name `xml:"item"`	
+	Uid              string       `xml:"uidid,attr"`
+	Arg              string       `xml:"arg,attr"`
+	Title             string       `xml:"title"`
+	Sub              string       `xml:"sub"`
+	Icon             string       `xml:"icon"`
+	Valid            string          `xml:"valid,attr"`
+	Auto             string       `xml:"auto,attr"`
+	Rtype            string       `xml:"type,attr,omitempty"`
+}
+
+var(
+	cache string
+	data string
+	bundleId string
+	path string
+	home string
+	err error
+	maxResults int
+	currentResult int
+	results []AlfredResult
+)
+
+//
+// Library Function:
+//
+//				init 			This function is called upon library use to initialize 
+//							any variables used for the library before anyone
+// 							can make a call to a library function. 
+//
+func init() {
+	//
+	// Set the path and home variables from the environment.
+	//
+	path, err = os.Getwd()
+	home =  os.Getenv("HOME")
+	if _, err = os.Stat("info.plist" ); err == nil {
+		//
+		// The file exists. Read it for the bundleid and set the bundleId variable. 
+		//
+		bundleId = GetBundleId()
+	} else {
+		//
+		// Give an error message and set error to it. Then return. 
+		//
+		log.Println("There is no plist!")
+		return
+	}
+
+	//
+	// Create the directory structure for the cache and data directories. 
+	//
+	cache = home + "/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/" + bundleId;
+	data  = home + "/Library/Application Support/Alfred 2/Workflow Data/" + bundleId;
+
+	//
+	// See if the cache directory exists. 
+	//
+	if _, err := os.Stat(cache); os.IsNotExist(err) {
+		//
+		// The cache directory does not exist. Create it. 
+		//
+		err = os.MkdirAll(cache, os.ModeDir)
+	}
+
+	//
+	// See if the data directory exists. 
+	//
+	if _, err := os.Stat(data); os.IsNotExist(err) {
+		//
+		// The data directory does not exist. Create it. 
+		//
+		err = os.MkdirAll(data, os.ModeDir)
+	}
+
+	//
+	// Create the result array. 
+	//
+	results = make([]AlfredResult, 10)
+	maxResults = 10
+	currentResult = 0
+}
+
+//
+// Function:           GetBundleId 
+//
+// Description:       This function will read the workflows info.plist and return
+//                            the bundleid
+//
+func GetBundleId() string {
+	fileloc := path + "/info"
+	myout, err := exec.Command("/usr/bin/defaults", "read", fileloc , "bundleid").Output()
+	if(err != nil) {
+		log.Fatalf("Error with command: %v" ,err)
+	}
+	return(string(myout))
+}
+
+//
+// Function:           BundleId 
+//
+// Description:       This function returns the bundleid for the workflow. 
+//
+
+func BundleId() string {
+	return(  bundleId )
+}
+
+//
+// Function:           Cache 
+//
+// Description:       This function returns the cache directory for the workflow. 
+//
+func Cache() string {
+	return(  cache )  
+}
+
+//
+// Function:           Data 
+//
+// Description:       This function returns the data directory for the workflow. 
+//
+func Data() string {
+	return(data)
+}
+
+//
+// Function:           Path 
+//
+// Description:       This function returns the path to the workflow. 
+//
+func Path() string {
+	return(path)
+}
+
+//
+// Function:           Home 
+//
+// Description:       This function returns the Home directory for the user. 
+//
+func Home() string {
+	return(home)
+}
+
+//
+// Function:           Error 
+//
+// Description:       This routine will return the error string. 
+//
+func Error() error {
+	return(err)
+}
+
+//
+// Function:           ToXML 
+//
+// Description:       This function takes the result array and makes it into an
+//                            XML string for passing back to Alfred.  Possible help: 
+//                            http://golang.org/pkg/encoding/xml/#example_MarshalIndent
+//
+// Inputs:
+//                             arg          A string to base the ordering. 
+//
+func ToXML() string {
+	//
+	// Initialize the output string and create a string writer. 
+	//
+	newxml := "<items>"
+	buf := bytes.NewBufferString(newxml)
+
+	//
+	// Create the xml encoder. 
+	//
+	enc := xml.NewEncoder(buf)
+
+	//
+	// Encode it. If there is an error, print it to the log. 
+	//
+	if err := enc.Encode(results); err != nil {
+		log.Fatalf("ToXML Error: %v\n", err)
+	}
+
+	//
+	// Convert the buffer to a string and add the closing tag. 
+	//
+	newxml = buf.String() + "</times>"
+
+	//
+	// Return the XML string. 
+	//
+	return(newxml)
+}
+
+//
+// Function:           AddResult 
+//
+// Description:       Helper function that just makes it easier to pass values into a function
+//                           and create an array result to be passed back to Alfred. 
+//
+// Inputs:
+// 		uid 		the uid of the result, should be unique
+// 		arg 		the argument that will be passed on
+// 		title 		The title of the result item
+// 		sub 		The subtitle text for the result item
+// 		icon 		the icon to use for the result item
+// 		valid 		sets whether the result item can be actioned
+// 		auto 		the autocomplete value for the result item
+//
+
+func AddResult( uid string, arg string, title string, sub string, icon string, valid string, auto string, rtype string) {
+	//
+	// Add in the new result array if not full. 
+	//
+	if (currentResult < maxResults) {
+		results[currentResult] .Uid = uid
+		results[currentResult] .Arg = arg
+		results[currentResult] .Title = title
+		results[currentResult] .Sub = sub
+		results[currentResult].Icon = icon
+		results[currentResult] .Valid = valid
+		results[currentResult] .Auto = auto
+		results[currentResult].Rtype = rtype
+		currentResult++
+	}
+}
+
