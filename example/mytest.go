@@ -10,7 +10,7 @@ package main
 // Import the libraries we use for this program.
 //
 import (
-	"./src/goAlfred"
+	"github.com/raguay/goAlfred"
 	"os"
 	"fmt"
 )
