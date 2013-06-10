@@ -14,8 +14,9 @@ import (
 	"log"
 	"bytes"
 	"os"
-	"os/exec"
 	"encoding/xml"
+	"io/ioutil"
+	"github.com/mkrautz/plist"
 )
 
 //
@@ -36,7 +37,7 @@ import (
 type AlfredResult struct {
 	XMLName   xml.Name `xml:"item"`	
 	Uid              string       `xml:"uidid,attr"`
-	Arg              string       `xml:"arg,attr"`
+	Arg              string       `xml:"arg"`
 	Title             string       `xml:"title"`
 	Sub              string       `xml:"sub"`
 	Icon             string       `xml:"icon"`
@@ -124,12 +125,35 @@ func init() {
 //                            the bundleid
 //
 func GetBundleId() string {
-	fileloc := path + "/info"
-	myout, err := exec.Command("/usr/bin/defaults", "read", fileloc , "bundleid").Output()
-	if(err != nil) {
-		log.Fatalf("Error with command: %v" ,err)
+	//
+	// My version before the plist reader worked. 
+	//
+	fileloc := path + "/info.plist"
+	//myout, err := exec.Command("/usr/bin/defaults", "read", fileloc , "bundleid").Output()
+	//if(err != nil) {
+	//	log.Fatalf("Error with command: %v" ,err)
+	//}
+	//return(string(myout))
+
+	buf, err := ioutil.ReadFile(fileloc)
+	if err != nil {
+		log.Fatalf("%v", err)
 	}
-	return(string(myout))
+	var workflow map[string]interface{}
+	err = plist.Unmarshal(buf, &workflow)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
+	v, ok := workflow["bundleid"]
+	if !ok {
+		log.Fatalf("expected bundleid key, but wasn't found")
+	}
+
+	//
+	// Return the bundle ID.
+	//
+	return(v.(string))
 }
 
 //
