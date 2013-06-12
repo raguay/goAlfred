@@ -241,14 +241,21 @@ func ToXML() string {
 	//
 	// Encode it. If there is an error, print it to the log. 
 	//
-	if err := enc.Encode(results); err != nil {
-		log.Fatalf("ToXML Error: %v\n", err)
+	//if err := enc.Encode(results); err != nil {
+	//	log.Fatalf("ToXML Error: %v\n", err)
+	//}
+	for i:=0;i<maxResults;i++ {
+		if results[i].Uid != "" {
+			if err := enc.Encode(results[i]); err != nil {
+				log.Fatalf("ToXML Error: %v\n", err)	
+			}
+		}
 	}
 
 	//
 	// Convert the buffer to a string and add the closing tag. 
 	//
-	newxml = buf.String() + "</items>"
+	newxml = buf.String() + "</items>\n"
 
 	//
 	// Return the XML string. 
