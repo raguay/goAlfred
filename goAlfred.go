@@ -17,6 +17,8 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"github.com/mkrautz/plist"
+	"strings"
+	"regexp"
 )
 
 //
@@ -114,6 +116,7 @@ func init() {
 	// Create the result array. 
 	//
 	results = make([]AlfredResult, 10)
+	results[0].Title = "No matches found..."
 	maxResults = 10
 	currentResult = 0
 }
@@ -265,8 +268,8 @@ func ToXML() string {
 // 		icon 		the icon to use for the result item
 // 		valid 		sets whether the result item can be actioned
 // 		auto 		the autocomplete value for the result item
+//              rtype           I have no idea what this one is used for. HELP!
 //
-
 func AddResult( uid string, arg string, title string, sub string, icon string, valid string, auto string, rtype string) {
 	//
 	// Add in the new result array if not full. 
@@ -284,3 +287,54 @@ func AddResult( uid string, arg string, title string, sub string, icon string, v
 	}
 }
 
+//
+// Function:           AddResultsSimilar 
+//
+// Description:       This function will only add the results that are similar to the input given. 
+//                            This is used to select input selectively from what the user types in. 
+//
+// Inputs:
+//               instring      the string to test against the titles to allow that record or not
+// 		uid 		the uid of the result, should be unique
+// 		arg 		the argument that will be passed on
+// 		title 		The title of the result item
+// 		sub 		The subtitle text for the result item
+// 		icon 		the icon to use for the result item
+// 		valid 		sets whether the result item can be actioned
+// 		auto 		the autocomplete value for the result item
+//              rtype           I have no idea what this one is used for. HELP!
+//
+func AddResultsSimilar( instring string, uid string, arg string, title string, sub string, icon string, valid string, auto string, rtype string) {
+	//
+	// Create the test pattern. 
+	//
+	instring = strings.ToLower(instring) + ".*"
+
+	// 
+	// Compare the match string to the title for the Alfred output. 
+	//
+         mt, _ := regexp.MatchString(instring, strings.ToLower(title))
+         if(mt) {
+         	//
+         	// A match, add it to the results. 
+         	//
+         	AddResult( uid, arg, title, sub, icon, valid,  auto, rtype) 
+         }
+}
+
+//
+// Function:           SetDefaultString
+//
+// Description:       This function sets a different default title
+//
+// Inputs:
+// 		title 	the title to use
+//
+func SetDefaultString(title string) {
+	if(currentResult == 0) {
+		//
+		// Add only if no results have been added.
+		//
+		results[0].Title = title
+	}
+}
