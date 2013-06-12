@@ -36,7 +36,7 @@ The accessible function calls are:
 
 <tr><td>AddResultSimilar(instring string, uid string, arg string, title string, sub string, icon string, valid string, auto string, rtype string)</td><td>This function allows you to build up the xml string for returning to Alfred only if the title is similar to the instring given.</td></tr>
 
-<tr><td>goAlfred.SetDefaultString(title string)</td><td>This function allows for the builting of the XML string conditionally on the instring input.</td></tr>
+<tr><td>goAlfred.SetDefaultString(title string)</td><td>This function sets a different default message if no results have been added.</td></tr>
 
 <tr><td>goAlfred.GetXML()</td><td>This function returns the XML string that needs to be given to Alfred.</td></tr>
 </table>
