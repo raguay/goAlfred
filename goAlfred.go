@@ -243,7 +243,7 @@ func ToXML() string {
 	//
 	// Convert the buffer to a string and add the closing tag. 
 	//
-	newxml = buf.String() + "</times>"
+	newxml = buf.String() + "</items>"
 
 	//
 	// Return the XML string. 
