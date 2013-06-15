@@ -118,7 +118,7 @@ func init() {
 	results = make([]AlfredResult, 10)
 	results[0].Title = "No matches found..."
 	results[0].Uid = "default"
-	results[0].Valid = "yes"
+	results[0].Valid = "no"
 	maxResults = 10
 	currentResult = 0
 }
