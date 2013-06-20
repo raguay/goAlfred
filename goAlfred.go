@@ -99,7 +99,14 @@ func init() {
 		//
 		// The cache directory does not exist. Create it. 
 		//
-		err = os.MkdirAll(cache, os.ModeDir)
+		err = os.MkdirAll(cache, 0777|os.ModeDir)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+		err = os.Chmod(cache, 0777|os.ModeDir)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
 	}
 
 	//
@@ -109,7 +116,14 @@ func init() {
 		//
 		// The data directory does not exist. Create it. 
 		//
-		err = os.MkdirAll(data, os.ModeDir)
+		err = os.MkdirAll(data, 0777|os.ModeDir)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+		err = os.Chmod(data, 0777|os.ModeDir)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
 	}
 
 	//
