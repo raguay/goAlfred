@@ -41,7 +41,7 @@ type AlfredResult struct {
 	Uid              string       `xml:"uidid,attr"`
 	Arg              string       `xml:"arg"`
 	Title             string       `xml:"title"`
-	Sub              string       `xml:"sub"`
+	Sub              string       `xml:"subtitle"`
 	Icon             string       `xml:"icon"`
 	Valid            string          `xml:"valid,attr"`
 	Auto             string       `xml:"auto,attr"`
