@@ -45,7 +45,7 @@ type AlfredResult struct {
 	Sub      string   `xml:"subtitle"`
 	Icon     string   `xml:"icon"`
 	Valid    string   `xml:"valid,attr"`
-	Auto     string   `xml:"auto,attr"`
+	Auto     string   `xml:"autocomplete,attr"`
 	Rtype    string   `xml:"type,attr,omitempty"`
 	Priority int      `xml:"omit"`
 }
