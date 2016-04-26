@@ -13,7 +13,6 @@ package goAlfred
 import (
 	"bytes"
 	"encoding/xml"
-	"github.com/mkrautz/plist"
 	"io/ioutil"
 	"log"
 	"os"
@@ -53,7 +52,6 @@ type AlfredResult struct {
 var (
 	cache         string
 	data          string
-	bundleId      string
 	path          string
 	home          string
 	err           error
@@ -87,24 +85,12 @@ func init() {
 	//
 	path, err = os.Getwd()
 	home = os.Getenv("HOME")
-	if _, err = os.Stat("info.plist"); err == nil {
-		//
-		// The file exists. Read it for the bundleid and set the bundleId variable.
-		//
-		bundleId = GetBundleId()
-	} else {
-		//
-		// Give an error message and set error to it. Then return.
-		//
-		log.Println("There is no plist!")
-		return
-	}
 
 	//
 	// Create the directory structure for the cache and data directories.
 	//
-	cache = home + "/Library/Caches/com.runningwithcrayons.Alfred-2/Workflow Data/" + bundleId
-	data = home + "/Library/Application Support/Alfred 2/Workflow Data/" + bundleId
+	cache = os.Getenv("alfred_workflow_data")
+	data = os.Getenv("alfred_workflow_cache")
 
 	//
 	// See if the cache directory exists.
@@ -149,54 +135,6 @@ func init() {
 	results[0].Valid = "no"
 	maxResults = 10
 	currentResult = 0
-}
-
-//
-// Function:           GetBundleId
-//
-// Description:       This function will read the workflows info.plist and return
-//                            the bundleid
-//
-func GetBundleId() string {
-	//
-	// My version before the plist reader worked.
-	//
-	fileloc := path + "/info.plist"
-	//myout, err := exec.Command("/usr/bin/defaults", "read", fileloc , "bundleid").Output()
-	//if(err != nil) {
-	//	log.Fatalf("Error with command: %v" ,err)
-	//}
-	//return(string(myout))
-
-	buf, err := ioutil.ReadFile(fileloc)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-	var workflow map[string]interface{}
-	err = plist.Unmarshal(buf, &workflow)
-	if err != nil {
-		log.Fatalf("%v", err)
-	}
-
-	v, ok := workflow["bundleid"]
-	if !ok {
-		log.Fatalf("expected bundleid key, but wasn't found")
-	}
-
-	//
-	// Return the bundle ID.
-	//
-	return (v.(string))
-}
-
-//
-// Function:           BundleId
-//
-// Description:       This function returns the bundleid for the workflow.
-//
-
-func BundleId() string {
-	return (bundleId)
 }
 
 //
