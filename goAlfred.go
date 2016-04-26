@@ -13,7 +13,6 @@ package goAlfred
 import (
 	"bytes"
 	"encoding/xml"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
