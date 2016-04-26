@@ -88,8 +88,8 @@ func init() {
 	//
 	// Create the directory structure for the cache and data directories.
 	//
-	cache = os.Getenv("alfred_workflow_data")
-	data = os.Getenv("alfred_workflow_cache")
+	cache = os.Getenv("alfred_workflow_cache")
+	data = os.Getenv("alfred_workflow_data")
 
 	//
 	// See if the cache directory exists.
