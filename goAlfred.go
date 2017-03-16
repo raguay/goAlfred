@@ -102,7 +102,7 @@ func init() {
 	//
 	// See if the cache directory exists.
 	//
-	if _, err := os.Stat(cache); os.IsNotExist(err) {
+	if _, err = os.Stat(cache); os.IsNotExist(err) {
 		//
 		// The cache directory does not exist. Create it.
 		//
