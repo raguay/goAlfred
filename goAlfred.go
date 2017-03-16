@@ -119,7 +119,7 @@ func init() {
 	//
 	// See if the data directory exists.
 	//
-	if _, err := os.Stat(data); os.IsNotExist(err) {
+	if _, err = os.Stat(data); os.IsNotExist(err) {
 		//
 		// The data directory does not exist. Create it.
 		//
