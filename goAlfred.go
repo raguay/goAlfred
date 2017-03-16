@@ -91,10 +91,18 @@ func init() {
 	cache = os.Getenv("alfred_workflow_cache")
 	data = os.Getenv("alfred_workflow_data")
 
+	if cache == "" {
+		log.Fatalf("Environment variable alfred_workflow_cache not set")
+	}
+
+	if data == "" {
+		log.Fatalf("Environment variable alfred_workflow_data not set")
+	}
+
 	//
 	// See if the cache directory exists.
 	//
-	if _, err := os.Stat(cache); os.IsNotExist(err) {
+	if _, err = os.Stat(cache); os.IsNotExist(err) {
 		//
 		// The cache directory does not exist. Create it.
 		//
